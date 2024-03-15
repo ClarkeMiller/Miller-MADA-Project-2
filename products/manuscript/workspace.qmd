@@ -1,0 +1,379 @@
+---
+title: "Example Manuscript Template for a Data Analysis Project"
+subtitle: "Clarke Miller Project Proposal"
+author: Clarke Miller
+date: "`r Sys.Date()`"
+format:
+  docx:
+    toc: false
+    number-sections: true
+    highlight-style: github
+bibliography: ../../assets/dataanalysis-references.bib
+csl: ../../assets/apa.csl
+---
+
+The structure below is one possible setup for a data analysis project (including the course project). For a manuscript, adjust as needed. You don't need to have exactly these sections, but the content covering those sections should be addressed.
+
+This uses MS Word as output format. [See here](https://quarto.org/docs/output-formats/ms-word.html) for more information. You can switch to other formats, like html or pdf. See [the Quarto documentation](https://quarto.org/) for other formats.
+
+```{r, echo=FALSE, message=FALSE}
+# load a few R packages
+suppressPackageStartupMessages(library(here))
+suppressPackageStartupMessages(library(knitr))
+```
+
+# Summary/Abstract
+
+{{< pagebreak >}}
+
+# Introduction
+
+## General Background Information
+
+According to data provided by the World Health organization, seasonal respiratory illnesses are linked to over 650,000 deaths each year worldwide. In the United States the flu is responsible for approximately 42,000 deaths per year and ranks 13th most frequent cause of death.
+
+## Description of data and data source
+
+Detailed data on covid and flu strains, outbreaks, and general epidemiological information is available via several sources. Data on these infectious diseases is available from sites such as GISAID (<https://gisaid.org/>) and the Global Health Data Exchange (<https://ghdx.healthdata.org/>). These databases are highly detailed and can provide data that includes information about lineage and geographic data. (See Figure 1 Below.)
+
+```{r}
+
+#| label: fig-schematic
+#| fig-cap: "Figure 1: World Flu Burden by Clade."
+#| echo: FALSE
+knitr::include_graphics(here("assets","World Flu by Cladep.png"))
+
+```
+
+## Questions/Hypotheses to be addressed
+
+*State the research questions you plan to answer with this analysis.*
+
+The research questions that i would like to answer are: 1. Can the progression of flu outbreaks be traced geographically and temporally over the course of a year? 2. Is there a specific location from which the annual predominant strain of flu originates? 3. If a pattern can be established, does it repeat on a yearly basis? Does the pattern shift from year to year? Can other factors, such as weather, account for any changes to this pattern?
+
+Note: I am certain that efforts like this already exist. My purpose for this project is to use it as a learning tool and to see if I can relicate those prior efforts.
+
+{{< pagebreak >}}
+
+# Methods
+
+*Describe your methods. That should describe the data, the cleaning processes, and the analysis approaches. You might want to provide a shorter description here and all the details in the supplement.*
+
+## Schematic of workflow
+
+Sometimes you might want to show a schematic diagram/figure that was not created with code (if you can do it with code, do it). @fig-schematic is an example of some - completely random/unrelated - schematic that was generated with Biorender. We store those figures in the `assets` folder.
+
+```{r}
+#| label: fig-schematic
+#| fig-cap: "A figure that is manually generated and shows some overview/schematic. This has nothing to do with the data, it's just a random one from one of our projects I found and placed here."
+#| echo: FALSE
+knitr::include_graphics(here("assets","antigen-recognition.png"))
+```
+
+## Data aquisition
+
+Data was acquired from the World Health Organization Global Influenza Programme. The data includes the excel files containing raw data (VIW_FNT_CM.xlsx) and a file containing the legend for the data (VIW_FLU_METADATA.csv).
+
+## Data import and cleaning
+## Data import and cleaning
+
+```{r}
+#Call a bunch of libraries.
+suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(ggplot2))
+suppressPackageStartupMessages(library(broom)) 
+suppressPackageStartupMessages(library(here))
+suppressPackageStartupMessages(library(readxl)) 
+suppressPackageStartupMessages(library(dplyr)) 
+suppressPackageStartupMessages(library(tidyr)) 
+suppressPackageStartupMessages(library(skimr))
+suppressPackageStartupMessages(library(gt))
+suppressPackageStartupMessages(library(dslabs))
+suppressPackageStartupMessages(library(plotly))
+suppressPackageStartupMessages(library(gapminder))
+suppressPackageStartupMessages(library(kableExtra))
+
+#Load excel data file
+#Data file from WHO "VIW_FNT_CM.xlsx"
+
+data_location <- here::here("data","raw-data","VIW_FNT_CM.xlsx")
+WHO_data_flu <- readxl::read_excel(data_location)
+
+
+#Save a rds version
+save_data_location <- here::here("data","raw-data","VIW_FNT_CM.rds")
+saveRDS(WHO_data_flu, file = save_data_location)
+
+summary(WHO_data_flu)
+
+
+
+```
+Wow. That's a lot of data. Okay, let's filter the data a bit. I am still working out what my final analysis will look like and, frankly, doubting my coding abilities to produce a meaningful analysis. That being said, let's take a look.
+
+For example, we might want to look at the total flu cases compared to the number of total cases of the A strains and the total number of the B strains in countries such as China, Australia, Canada, and France.  We also want to clean up the data by omitting any missing values. So we filter!
+
+```{r}
+
+WHO_data_flu <- WHO_data_flu %>% 
+  select(WHOREGION, MMWR_WEEKSTARTDATE, COUNTRY_AREA_TERRITORY, INF_ALL, INF_A, INF_B)
+
+summary(WHO_data_flu)
+
+# Plot the time axis data using a layered bar graph
+plot1 <- ggplot(WHO_data_flu, aes(x = MMWR_WEEKSTARTDATE)) +
+  geom_bar(aes(y = INF_ALL, fill = "INF_ALL"), stat = "identity", color="black", position = "stack") + 
+  geom_bar(aes(y = INF_A, fill = "INF_A"), stat = "identity", color="black", position = "stack") + 
+  geom_bar(aes(y = INF_B, fill = "INF_B"), stat = "identity", color="black", position = "stack") + 
+  labs(title = "Influenza Cases Reported to WHO",
+       subtitle = "Country = all, 1995-2024 Season",
+       x = "Week",
+       y = "Number of Positive Specimens",
+       fill = "Influenza Type") + 
+  theme_minimal()
+
+plot1save = here("assets", "plot1.png")
+ggsave(plot1save, plot1, width = 10, height = 6, dpi = 300)
+
+#| label: fig-schematic
+#| fig-cap: "Figure 2: World Flu Burden by Year."
+#| echo: FALSE
+knitr::include_graphics(here("assets","plot1.png"))
+
+# Plot the region axis data using a layered bar graph
+plot1B <- ggplot(WHO_data_flu, aes(x = WHOREGION)) +
+  geom_bar(aes(y = INF_ALL, fill = "INF_ALL"), stat = "identity", color="black", position = "stack") + 
+  labs(title = "Influenza Cases Reported to WHO",
+       subtitle = "Country = all, 1995-2024 Season",
+       x = "WHO Region",
+       y = "Number of Positive Specimens",
+       fill = "Influenza Type") + 
+  theme_minimal()
+
+plot1Bsave = here("assets", "plot1B.png")
+ggsave(plot1Bsave, plot1B, width = 10, height = 6, dpi = 300)
+
+#| label: fig-schematic
+#| fig-cap: "Figure 3: World Flu Burden by Region."
+#| echo: FALSE
+knitr::include_graphics(here("assets","plot1B.png"))
+
+
+```
+```{r}
+
+WHO_data_flu1 <- WHO_data_flu %>% filter(COUNTRY_AREA_TERRITORY == "China")
+WHO_data_flu1 <- WHO_data_flu1 %>% filter(COUNTRY_AREA_TERRITORY == "China")
+WHO_data_flu1 <- na.omit(WHO_data_flu1)
+
+library(gt)
+WHO_data_flu1 |> 
+  gt() 
+
+# Plot the data using a layered bar graph
+plot2 <- ggplot(WHO_data_flu1, aes(x = MMWR_WEEKSTARTDATE)) +
+  geom_bar(aes(y = INF_ALL, fill = "INF_ALL"), stat = "identity", color="black", position = "stack") + 
+  geom_bar(aes(y = INF_A, fill = "INF_A"), stat = "identity", color="black", position = "stack") + 
+  geom_bar(aes(y = INF_B, fill = "INF_B"), stat = "identity", color="black", position = "stack") + 
+  labs(title = "Influenza Cases Reported to WHO",
+       subtitle = "Country = China, 2005-2024 Seasons",
+       x = "Week",
+       y = "Number of Positive Specimens",
+       fill = "Influenza Type") + 
+  theme_minimal()
+
+plot2save = here("assets", "plot2.png")
+ggsave(plot2save, plot2, width = 10, height = 6, dpi = 300)
+
+#| label: fig-schematic
+#| fig-cap: "Figure 4: World Flu Burden by Year for China Since Reporting Began."
+#| echo: FALSE
+knitr::include_graphics(here("assets","plot2.png"))
+
+
+```
+
+That's still a LOT of data. Notice the big gap around 2020-2022. That is due to the restrictions imposed by the COVID pandemic. Let's narrow this down to a more reasonable range... say to the beginning of the 2023-2024 flu season.
+
+```{r}
+WHO_data_flu2 <- WHO_data_flu1 %>% filter(MMWR_WEEKSTARTDATE > '2023-10-01')
+WHO_data_flu2 <- WHO_data_flu2 %>% filter(MMWR_WEEKSTARTDATE > '2023-10-01')
+WHO_data_flu2 <- na.omit(WHO_data_flu2)
+
+library(gt)
+WHO_data_flu2 |> 
+  gt() 
+
+# Plot the data using a layered bar graph
+plot3 <- ggplot(WHO_data_flu2, aes(x = MMWR_WEEKSTARTDATE)) +
+  geom_bar(aes(y = INF_ALL, fill = "INF_ALL"), stat = "identity", color="black", position = "stack") + 
+  geom_bar(aes(y = INF_A, fill = "INF_A"), stat = "identity", color="black", position = "stack") + 
+  geom_bar(aes(y = INF_B, fill = "INF_B"), stat = "identity", color="black", position = "stack") + 
+  labs(title = "Influenza Cases Reported to WHO",
+       subtitle = "Country = China, 2022-2024 Seasons",
+       x = "Week",
+       y = "Number of Positive Specimens",
+       fill = "Influenza Type") + 
+  theme_minimal()
+
+plot3save = here("assets", "plot3.png")
+ggsave(plot3save, plot3, width = 10, height = 6, dpi = 300)
+
+#| label: fig-schematic
+#| fig-cap: "Figure 4: World Flu Burden by Year."
+#| echo: FALSE
+knitr::include_graphics(here("assets","plot3.png"))
+
+WHO_data_fluB <- WHO_data_flu %>% filter(MMWR_WEEKSTARTDATE > '2023-05-01')
+WHO_data_fluB <- WHO_data_fluB %>% filter(MMWR_WEEKSTARTDATE > '2023-05-01')
+WHO_data_fluB <- na.omit(WHO_data_fluB)
+
+library(gt)
+WHO_data_fluB |> 
+  gt() 
+
+# Plot the region axis data using a layered bar graph
+plot1C <- ggplot(WHO_data_fluB, aes(x = WHOREGION)) +
+  geom_bar(aes(y = INF_ALL, fill = "INF_ALL"), stat = "identity", color="black", position = "stack") + 
+  labs(title = "Influenza Cases Reported to WHO",
+       subtitle = "Country = all, 2022-2024 Season",
+       x = "WHO Region",
+       y = "Number of Positive Specimens",
+       fill = "Influenza Type") + 
+  theme_minimal()
+
+plot1Csave = here("assets", "plot1C.png")
+ggsave(plot1Csave, plot1C, width = 10, height = 6, dpi = 300)
+
+#| label: fig-schematic
+#| fig-cap: "Figure 5: World Flu Burden by Region."
+#| echo: FALSE
+knitr::include_graphics(here("assets","plot1C.png"))
+
+plot2B <- ggplot(WHO_data_fluB, aes(x=MMWR_WEEKSTARTDATE)) +
+  geom_point(aes(y=INF_ALL, color = WHOREGION)) +
+  geom_line(aes(y=INF_ALL, color = WHOREGION)) +
+    labs(x = "DATE", y = "Total Reported Cases of FLU", title = "Scatterplot Flu Cases Per WHO Region for the 2023-2024 Flu Season") +
+  theme_minimal()
+
+plot2Bsave = here("assets", "plot2B.png")
+ggsave(plot2Bsave, plot2B, width = 10, height = 6, dpi = 300)
+
+#| label: fig-schematic
+#| fig-cap: "Figure 6: World Flu Burden by Region Over the 2023-2024 Flu Season."
+#| echo: FALSE
+knitr::include_graphics(here("assets","plot2B.png"))
+
+```
+
+WHO_data_fluB <- WHO_data_flu %>% filter(WHOREGION == "AFR") %>% mutate (INF_AFR = INF_ALL)
+WHO_data_fluB <- WHO_data_flu %>% filter(WHOREGION == "AMR") %>% mutate (INF_AMR = INF_ALL)
+WHO_data_fluB <- WHO_data_flu %>% filter(WHOREGION == "EUR") %>% mutate (INF_EUR = INF_ALL)
+WHO_data_fluB <- WHO_data_flu %>% filter(WHOREGION == "WPR") %>% mutate (INF_WPR = INF_ALL)
+
+plot2A <- ggplot(WHO_data_fluB, aes(x = MMWR_WEEKSTARTDATE)) +
+  geom_point(aes(y = INF_AFR), color = "red") +
+  geom_line(aes(y = INF_AFR), color = "red") +
+  geom_point(aes(y = INF_AMR), color = "blue") +
+  geom_line(aes(y = INF_AMR), color = "blue") +
+  geom_point(aes(y = INF_EUR), color = "green") +
+  geom_line(aes(y = INF_EUR), color = "green") +
+  geom_point(aes(y = INF_WPR), color = "magenta") +
+  geom_line(aes(y = INF_WPR), color = "magenta") +
+  labs(x = "DATE", y = "Total Reported Cases of FLU", title = "Scatterplot Flu Cases Per WHO Region for the 2023-2024 Flu Season") +
+  theme_minimal()
+
+plot2Asave = here("assets", "plot2A.png")
+ggsave(plot2Asave, plot2A, width = 10, height = 6, dpi = 300)
+
+#| label: fig-schematic
+#| fig-cap: "Figure 6: World Flu Burden by Region Over the 2023-2024 Flu Season."
+#| echo: FALSE
+knitr::include_graphics(here("assets","plot2A.png"))
+
+
+```
+
+
+
+
+```
+
+## Statistical analysis
+
+*Explain anything related to your statistical analyses.*
+
+{{< pagebreak >}}
+
+# Results
+
+## Exploratory/Descriptive analysis
+
+*Use a combination of text/tables/figures to explore and describe your data. Show the most important descriptive results here. Additional ones should go in the supplement. Even more can be in the R and Quarto files that are part of your project.*
+
+@tbl-summarytable shows a summary of the data.
+
+Note the loading of the data providing a **relative** path using the `../../` notation. (Two dots means a folder up). You never want to specify an **absolute** path like `C:\ahandel\myproject\results\` because if you share this with someone, it won't work for them since they don't have that path. You can also use the `here` R package to create paths. See examples of that below. I generally recommend the `here` package.
+
+```{r}
+#| label: tbl-summarytable
+#| tbl-cap: "Data summary table."
+#| echo: FALSE
+resulttable=readRDS("../../results/tables/summarytable.rds")
+knitr::kable(resulttable)
+```
+
+## Basic statistical analysis
+
+*To get some further insight into your data, if reasonable you could compute simple statistics (e.g. simple models with 1 predictor) to look for associations between your outcome(s) and each individual predictor variable. Though note that unless you pre-specified the outcome and main exposure, any "p\<0.05 means statistical significance" interpretation is not valid.*
+
+@fig-result shows a scatterplot figure produced by one of the R scripts.
+
+```{r}
+#| label: fig-result
+#| fig-cap: "Height and weight stratified by gender."
+#| echo: FALSE
+knitr::include_graphics(here("results","figures","height-weight-stratified.png"))
+```
+
+## Full analysis
+
+*Use one or several suitable statistical/machine learning methods to analyze your data and to produce meaningful figures, tables, etc. This might again be code that is best placed in one or several separate R scripts that need to be well documented. You want the code to produce figures and data ready for display as tables, and save those. Then you load them here.*
+
+Example @tbl-resulttable2 shows a summary of a linear model fit.
+
+```{r}
+#| label: tbl-resulttable2
+#| tbl-cap: "Linear model fit table."
+#| echo: FALSE
+resulttable2 = readRDS(here("results","tables","resulttable2.rds"))
+knitr::kable(resulttable2)
+```
+
+{{< pagebreak >}}
+
+# Discussion
+
+## Summary and Interpretation
+
+*Summarize what you did, what you found and what it means.*
+
+## Strengths and Limitations
+
+*Discuss what you perceive as strengths and limitations of your analysis.*
+
+## Conclusions
+
+*What are the main take-home messages?*
+
+*Include citations in your Rmd file using bibtex, the list of references will automatically be placed at the end*
+
+This paper [@leek2015] discusses types of analyses.
+
+These papers [@mckay2020; @mckay2020a] are good examples of papers published using a fully reproducible setup similar to the one shown in this template.
+
+Note that this cited reference will show up at the end of the document, the reference formatting is determined by the CSL file specified in the YAML header. Many more style files for almost any journal [are available](https://www.zotero.org/styles). You also specify the location of your bibtex reference file in the YAML. You can call your reference file anything you like.
+
+{{< pagebreak >}}
+
+# References

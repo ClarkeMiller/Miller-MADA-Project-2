@@ -1,7 +1,7 @@
 ---
 title: "Example Manuscript Template for a Data Analysis Project"
-subtitle: ""
-author: Andreas Handel
+subtitle: "Clarke Miller Project Proposal"
+author: Clarke Miller
 date: "`r Sys.Date()`"
 format:
   docx:
@@ -13,6 +13,7 @@ csl: ../../assets/apa.csl
 ---
 
 The structure below is one possible setup for a data analysis project (including the course project). For a manuscript, adjust as needed. 
+
 You don't need to have exactly these sections, but the content covering those sections should be addressed.
 
 This uses MS Word as output format. [See here](https://quarto.org/docs/output-formats/ms-word.html) for more information. You can switch to other formats, like html or pdf. See [the Quarto documentation](https://quarto.org/) for other formats.
@@ -20,34 +21,49 @@ This uses MS Word as output format. [See here](https://quarto.org/docs/output-fo
 
 ```{r, echo=FALSE, message=FALSE}
 # load a few R packages
-library(here)
-library(knitr)
+suppressPackageStartupMessages(library(here))
+suppressPackageStartupMessages(library(knitr))
 ```
 
 
-
 # Summary/Abstract
-_Write a summary of your project._
 
 
-{{< pagebreak >}}
 
 
-# Introduction 
+
+# Introduction
 
 ## General Background Information
-_Provide enough background on your topic that others can understand the why and how of your analysis_ 
+
+According to data provided by the World Health organization, seasonal respiratory illnesses are linked to over 650,000 deaths each year worldwide. In the United States the flu is responsible for approximately 42,000 deaths per year and ranks 13th most frequent cause of death.  As such, influenza is the subject of extensive public health surveillance and mediation efforts.
 
 ## Description of data and data source
-_Describe what the data is, what it contains, where it is from, etc. Eventually this might be part of a methods section._
+
+Detailed data on covid and flu strains, outbreaks, and general epidemiological information is available via several sources. Data on these infectious diseases is available from sites such as GISAID (<https://gisaid.org/>) and the Global Health Data Exchange (<https://ghdx.healthdata.org/>). These databases are highly detailed and can provide data that includes information about lineage and geographic data. (See Figure 1 Below.) 
+
+```{r}
+
+#| label: fig-schematic
+#| fig-cap: "Figure 1: World Flu Burden by Clade."
+#| echo: FALSE
+knitr::include_graphics(here("assets","World Flu by Cladep.png"))
+
+```
 
 ## Questions/Hypotheses to be addressed
-_State the research questions you plan to answer with this analysis._
 
-To cite other work (important everywhere, but likely happens first in introduction), make sure your references are in the bibtex file specified in the YAML header above and have the right bibtex key. Then you can include like this:
+*State the research questions you plan to answer with this analysis.*
 
-Examples of reproducible research projects can for instance be found in [@mckay2020; @mckay2020a].
+The research questions that I would like to answer are: 
 
+1. Can the progression of flu outbreaks be traced geographically or temporally over the course of a year? 
+
+2. Is there a specific location from which the annual predominant strain of flu originates? 
+
+3. If a pattern can be established, does it repeat on a yearly basis? Does the pattern shift from year to year? Can other factors, such as weather, account for any changes to this pattern?
+
+I am certain that efforts like this already exist. My purpose for this project is to use it as a learning tool and to see if I can replicate those prior efforts.  Data to support this project is readily availble from multiple sources such as GISAID (<https://gisaid.org/>), the World Health Organization Global Influenza Programme (<https://www.who.int/tools/flunet>).  
 
 
 {{< pagebreak >}}
@@ -55,31 +71,119 @@ Examples of reproducible research projects can for instance be found in [@mckay2
 
 # Methods 
 
-_Describe your methods. That should describe the data, the cleaning processes, and the analysis approaches. You might want to provide a shorter description here and all the details in the supplement._
+
 
 
 ## Schematic of workflow
 
-Sometimes you might want to show a schematic diagram/figure that was not created with code (if you can do it with code, do it). @fig-schematic is an example of some - completely random/unrelated - schematic that was generated with Biorender.
-We store those figures in the `assets` folder.
-
-```{r}
-#| label: fig-schematic
-#| fig-cap: "A figure that is manually generated and shows some overview/schematic. This has nothing to do with the data, it's just a random one from one of our projects I found and placed here."
-#| echo: FALSE
-knitr::include_graphics(here("assets","antigen-recognition.png"))
-```
-
-
 
 
 ## Data aquisition
-_As applicable, explain where and how you got the data. If you directly import the data from an online source, you can combine this section with the next._
 
+Data was acquired from the World Health Organization Global Influenza Programme. The data includes the excel files containing raw data (VIW_FNT_CM.xlsx) and a file containing the legend for the data (VIW_FLU_METADATA.csv).  This data set is one example of the data available for a project of this sort.  This specific data set includes information on 89 different parameters associated with influenza outbreaks as reported world-wide since about 1995.  The data includes time, region, type of flu, and many opther variables that are important for answereing the questions posed above.
 
 ## Data import and cleaning
-_Write code that reads in the file and cleans it so it's ready for analysis. Since this will be fairly long code for most datasets, it might be a good idea to have it in one or several R scripts. If that is the case, explain here briefly what kind of cleaning/processing you do, and provide more details and well documented code somewhere (e.g. as supplement in a paper). All materials, including files that contain code, should be commented well so everyone can follow along._
 
+```{r}
+#Call a bunch of libraries.
+suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(ggplot2))
+suppressPackageStartupMessages(library(broom)) 
+suppressPackageStartupMessages(library(here))
+suppressPackageStartupMessages(library(readxl)) 
+suppressPackageStartupMessages(library(dplyr)) 
+suppressPackageStartupMessages(library(tidyr)) 
+suppressPackageStartupMessages(library(skimr))
+suppressPackageStartupMessages(library(gt))
+suppressPackageStartupMessages(library(dslabs))
+suppressPackageStartupMessages(library(plotly))
+suppressPackageStartupMessages(library(gapminder))
+suppressPackageStartupMessages(library(kableExtra))
+
+#Load excel data file
+#Data file from WHO "VIW_FNT_CM.xlsx"
+
+data_location <- here::here("data","raw-data","VIW_FNT_CM.xlsx")
+WHO_data_flu <- readxl::read_excel(data_location)
+
+
+#Save a rds version
+save_data_location <- here::here("data","raw-data","VIW_FNT_CM.rds")
+saveRDS(WHO_data_flu, file = save_data_location)
+
+summary(WHO_data_flu)
+
+
+
+```
+Wow. That's a lot of data. Okay, let's filter the data a bit. I am still working out what my final analysis will look like and, frankly, doubting my coding abilities to produce a meaningful analysis. That being said, let's take a look.
+
+For example, we might want to look at the total flu cases compared to the number of total cases of the A strains and the total number of the B strains in countries such as China, Australia, Canada, and France.  We also want to clean up the data by omitting any missing values. So we filter!
+
+```{r}
+
+WHO_data_flu <- WHO_data_flu %>% 
+  select(WHOREGION, MMWR_WEEKSTARTDATE, COUNTRY_AREA_TERRITORY, INF_ALL, INF_A, INF_B)
+
+summary(WHO_data_flu)
+
+
+
+#| label: fig-schematic
+#| fig-cap: "Figure 2: World Flu Burden by Year."
+#| echo: FALSE
+knitr::include_graphics(here("assets","plot1.png"))
+
+
+
+#| label: fig-schematic
+#| fig-cap: "Figure 3: World Flu Burden by Region."
+#| echo: FALSE
+knitr::include_graphics(here("assets","plot1B.png"))
+
+
+```
+
+```{r}
+
+#| label: fig-schematic
+#| fig-cap: "Figure 4: World Flu Burden by Year for China Since Reporting Began."
+#| echo: FALSE
+knitr::include_graphics(here("assets","plot2.png"))
+
+
+```
+
+That's still a LOT of data. Notice the big gap around 2020-2022. That is due to the restrictions imposed by the COVID pandemic. Let's narrow this down to a more reasonable range... say to the beginning of the 2023-2024 flu season.
+
+```{r}
+
+
+#| label: fig-schematic
+#| fig-cap: "Figure 4: World Flu Burden by Year."
+#| echo: FALSE
+knitr::include_graphics(here("assets","plot3.png"))
+
+
+#| label: fig-schematic
+#| fig-cap: "Figure 5: World Flu Burden by Region."
+#| echo: FALSE
+knitr::include_graphics(here("assets","plot1C.png"))
+
+
+```
+These graphs help whittle down the data a bit.  For example, we can look at the stacked grpah in Figure 4 to see that over the course of the year the major flu variant shifted from influenza A to influenza B.  That being said, this format is not helpful for looking at the incidence over time per country or region.  To look at the sort of data we could do a stacked bar graph of the total flu counts per region/country or perhaps create a graph of the data using a simple scatter plot.
+
+```{r}
+
+#| label: fig-schematic
+#| fig-cap: "Figure 6: World Flu Burden by Region Over the 2023-2024 Flu Season."
+#| echo: FALSE
+knitr::include_graphics(here("assets","plot2B.png"))
+
+
+```
+Figure 6 
 
 ## Statistical analysis
 _Explain anything related to your statistical analyses._
