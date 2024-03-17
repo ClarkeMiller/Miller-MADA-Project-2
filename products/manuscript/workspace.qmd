@@ -92,6 +92,8 @@ suppressPackageStartupMessages(library(dslabs))
 suppressPackageStartupMessages(library(plotly))
 suppressPackageStartupMessages(library(gapminder))
 suppressPackageStartupMessages(library(kableExtra))
+suppressPackageStartupMessages(library(openxlsx))
+suppressPackageStartupMessages(library(xlsx))
 
 #Load excel data file
 #Data file from WHO "VIW_FNT_CM.xlsx"
@@ -270,6 +272,10 @@ summarized_data <- WHO_data_fluB %>%
   group_by(WHOREGION, MMWR_WEEKSTARTDATE) %>%
   summarize(TOT_INF_ALL = sum(INF_ALL))
 
+print(summarized_data)
+
+write.csv(summarized_data, file = "summarized_data.csv", row.names = FALSE)
+
 
 plot2C <- ggplot(summarized_data, aes(x=MMWR_WEEKSTARTDATE)) +
   geom_point(aes(y=TOT_INF_ALL, color = WHOREGION)) +
@@ -287,33 +293,66 @@ ggsave(plot2Csave, plot2C, width = 10, height = 6, dpi = 300)
 #| echo: FALSE
 knitr::include_graphics(here("assets","plot2C.png"))
 
+summarized_dataB <- WHO_data_fluB %>%
+  group_by(WHOREGION, MMWR_WEEKSTARTDATE) %>%
+  summarize(TOT_INF_A = sum(INF_A))
+
+print(summarized_dataB)
+
+write.csv(summarized_data, file = "summarized_dataB.csv", row.names = FALSE)
+
+summarized_dataC <- WHO_data_fluB %>%
+  group_by(WHOREGION, MMWR_WEEKSTARTDATE) %>%
+  summarize(TOT_INF_B = sum(INF_B))
+
+print(summarized_dataC)
+
+
+write.csv(summarized_data, file = "summarized_dataC.csv", row.names = FALSE)
+
+
 
 ```
+```{r}
 
-WHO_data_fluB <- WHO_data_flu %>% filter(WHOREGION == "AFR") %>% mutate (INF_AFR = INF_ALL)
-WHO_data_fluB <- WHO_data_flu %>% filter(WHOREGION == "AMR") %>% mutate (INF_AMR = INF_ALL)
-WHO_data_fluB <- WHO_data_flu %>% filter(WHOREGION == "EUR") %>% mutate (INF_EUR = INF_ALL)
-WHO_data_fluB <- WHO_data_flu %>% filter(WHOREGION == "WPR") %>% mutate (INF_WPR = INF_ALL)
+selected_regions1 <- c("WPR", "AMR", "EUR")
+selected_regions2 <- c("AFR", "SEAR", "EMR")
 
-plot2A <- ggplot(WHO_data_fluB, aes(x = MMWR_WEEKSTARTDATE)) +
-  geom_point(aes(y = INF_AFR), color = "red") +
-  geom_line(aes(y = INF_AFR), color = "red") +
-  geom_point(aes(y = INF_AMR), color = "blue") +
-  geom_line(aes(y = INF_AMR), color = "blue") +
-  geom_point(aes(y = INF_EUR), color = "green") +
-  geom_line(aes(y = INF_EUR), color = "green") +
-  geom_point(aes(y = INF_WPR), color = "magenta") +
-  geom_line(aes(y = INF_WPR), color = "magenta") +
-  labs(x = "DATE", y = "Total Reported Cases of FLU", title = "Scatterplot Flu Cases Per WHO Region for the 2023-2024 Flu Season") +
+# Filter the dataset for the selected regions
+subset_data1 <- subset(summarized_data, WHOREGION %in% selected_regions1)
+subset_data2 <- subset(summarized_data, WHOREGION %in% selected_regions2)
+
+plot2D <- ggplot(subset_data1, aes(x=MMWR_WEEKSTARTDATE)) +
+  geom_point(aes(y=TOT_INF_ALL, color = WHOREGION)) +
+  geom_line(aes(y=TOT_INF_ALL, color = WHOREGION)) +
+    labs(x = "DATE", y = "Total Reported Cases of FLU", title = "Scatterplot Flu Cases Per WHO Region for the 2023-2024 Flu Season") +
   theme_minimal()
 
-plot2Asave = here("assets", "plot2A.png")
-ggsave(plot2Asave, plot2A, width = 10, height = 6, dpi = 300)
+
+
+plot2Dsave = here("assets", "plot2D.png")
+ggsave(plot2Dsave, plot2D, width = 10, height = 6, dpi = 300)
 
 #| label: fig-schematic
-#| fig-cap: "Figure 6: World Flu Burden by Region Over the 2023-2024 Flu Season."
+#| fig-cap: "Figure 8: World Flu Burden by Region Over the 2023-2024 Flu Season."
 #| echo: FALSE
-knitr::include_graphics(here("assets","plot2A.png"))
+knitr::include_graphics(here("assets","plot2D.png"))
+
+
+plot2E <- ggplot(subset_data2, aes(x=MMWR_WEEKSTARTDATE)) +
+  geom_point(aes(y=TOT_INF_ALL, color = WHOREGION)) +
+  geom_line(aes(y=TOT_INF_ALL, color = WHOREGION)) +
+    labs(x = "DATE", y = "Total Reported Cases of FLU", title = "Scatterplot Flu Cases Per WHO Region for the 2023-2024 Flu Season") +
+  theme_minimal()
+
+
+plot2Esave = here("assets", "plot2E.png")
+ggsave(plot2Esave, plot2E, width = 10, height = 6, dpi = 300)
+
+#| label: fig-schematic
+#| fig-cap: "Figure 9: World Flu Burden by Region Over the 2023-2024 Flu Season."
+#| echo: FALSE
+knitr::include_graphics(here("assets","plot2E.png"))
 
 
 ```
@@ -321,7 +360,6 @@ knitr::include_graphics(here("assets","plot2A.png"))
 
 
 
-```
 
 ## Statistical analysis
 
