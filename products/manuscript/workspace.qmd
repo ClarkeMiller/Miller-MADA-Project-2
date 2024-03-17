@@ -264,6 +264,30 @@ ggsave(plot2Bsave, plot2B, width = 10, height = 6, dpi = 300)
 #| echo: FALSE
 knitr::include_graphics(here("assets","plot2B.png"))
 
+suppressPackageStartupMessages(library(dplyr)) 
+
+summarized_data <- WHO_data_fluB %>%
+  group_by(WHOREGION, MMWR_WEEKSTARTDATE) %>%
+  summarize(TOT_INF_ALL = sum(INF_ALL))
+
+
+plot2C <- ggplot(summarized_data, aes(x=MMWR_WEEKSTARTDATE)) +
+  geom_point(aes(y=TOT_INF_ALL, color = WHOREGION)) +
+  geom_line(aes(y=TOT_INF_ALL, color = WHOREGION)) +
+    labs(x = "DATE", y = "Total Reported Cases of FLU", title = "Scatterplot Flu Cases Per WHO Region for the 2023-2024 Flu Season") +
+  theme_minimal()
+
+
+
+plot2Csave = here("assets", "plot2C.png")
+ggsave(plot2Csave, plot2C, width = 10, height = 6, dpi = 300)
+
+#| label: fig-schematic
+#| fig-cap: "Figure 7: World Flu Burden by Region Over the 2023-2024 Flu Season."
+#| echo: FALSE
+knitr::include_graphics(here("assets","plot2C.png"))
+
+
 ```
 
 WHO_data_fluB <- WHO_data_flu %>% filter(WHOREGION == "AFR") %>% mutate (INF_AFR = INF_ALL)

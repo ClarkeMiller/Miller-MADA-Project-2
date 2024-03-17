@@ -171,8 +171,10 @@ knitr::include_graphics(here("assets","plot3.png"))
 knitr::include_graphics(here("assets","plot1C.png"))
 
 
+
+
 ```
-These graphs help whittle down the data a bit.  For example, we can look at the stacked grpah in Figure 4 to see that over the course of the year the major flu variant shifted from influenza A to influenza B.  That being said, this format is not helpful for looking at the incidence over time per country or region.  To look at the sort of data we could do a stacked bar graph of the total flu counts per region/country or perhaps create a graph of the data using a simple scatter plot.
+These graphs help whittle down the data a bit.  For example, we can look at the stacked grpah in Figure 4 to see that over the course of the year the major flu variant shifted from influenza A to influenza B.  That being said, this format is not helpful for looking at the incidence over time per country or region.  To look at the sort of data we could do a stacked bar graph of the total flu counts per region/country or perhaps create a graph of the data using a simple scatter plot.  The resulting graph shows that the maxima for the three largest WHO flu regions follow each other by approximately 3-4 weeks.  The region encompassing europe shows two distinct maxima.  The first maxima is preceded by the maxima in the People's Republic of China WHO region by 3-4 weeks and the second is preceded by the maxima in the data from the WHO Americas Region by the same time frame.  As such there certainly seems to be a geographic/time component to the spread of the flu worldwide.  Further analysis of the available phylogeographic data may be able to pinpoint the origin of each specific strain.
 
 ```{r}
 
@@ -180,6 +182,11 @@ These graphs help whittle down the data a bit.  For example, we can look at the 
 #| fig-cap: "Figure 6: World Flu Burden by Region Over the 2023-2024 Flu Season."
 #| echo: FALSE
 knitr::include_graphics(here("assets","plot2B.png"))
+
+#| label: fig-schematic
+#| fig-cap: "Figure 7: World Flu Burden by Region Over the 2023-2024 Flu Season."
+#| echo: FALSE
+knitr::include_graphics(here("assets","plot2C.png"))
 
 
 ```
