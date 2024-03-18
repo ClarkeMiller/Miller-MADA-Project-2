@@ -299,7 +299,7 @@ summarized_dataB <- WHO_data_fluB %>%
 
 print(summarized_dataB)
 
-write.csv(summarized_data, file = "summarized_dataB.csv", row.names = FALSE)
+write.csv(summarized_dataB, file = "summarized_dataB.csv", row.names = FALSE)
 
 summarized_dataC <- WHO_data_fluB %>%
   group_by(WHOREGION, MMWR_WEEKSTARTDATE) %>%
@@ -308,7 +308,7 @@ summarized_dataC <- WHO_data_fluB %>%
 print(summarized_dataC)
 
 
-write.csv(summarized_data, file = "summarized_dataC.csv", row.names = FALSE)
+write.csv(summarized_dataC, file = "summarized_dataC.csv", row.names = FALSE)
 
 
 
@@ -353,6 +353,97 @@ ggsave(plot2Esave, plot2E, width = 10, height = 6, dpi = 300)
 #| fig-cap: "Figure 9: World Flu Burden by Region Over the 2023-2024 Flu Season."
 #| echo: FALSE
 knitr::include_graphics(here("assets","plot2E.png"))
+
+
+```
+
+```{r}
+
+summarized_dataALL <- WHO_data_fluB %>%
+  group_by(WHOREGION, MMWR_WEEKSTARTDATE) %>%
+  summarise(
+    TOT_INF_ALL = sum(INF_ALL),
+    TOT_INF_A = sum (INF_B),
+    TOT_INF_B = sum (INF_B)
+  )
+
+print(summarized_dataALL)
+
+write.csv(summarized_dataALL, file = "summarized_dataALL.csv", row.names = FALSE)
+
+#WPR Region
+WHO_data_fluWPR <- summarized_dataALL %>% filter(WHOREGION == "WPR")
+WHO_data_fluWPR <- WHO_data_fluWPR %>% filter(WHOREGION == "WPR")
+WHO_data_fluWPR <- na.omit(WHO_data_fluWPR)
+
+
+print(WHO_data_fluWPR)
+
+write.csv(WHO_data_fluWPR, file = "WHO_data_fluWPR.csv", row.names = FALSE)
+
+# Plot the data using a layered bar graph
+plot5A <- ggplot(WHO_data_fluWPR, aes(x = MMWR_WEEKSTARTDATE)) +
+  geom_bar(aes(y = TOT_INF_ALL, fill = "INF_ALL"), stat = "identity", color="black", position = "stack") + 
+  geom_bar(aes(y = TOT_INF_A, fill = "INF_A"), stat = "identity", color="black", position = "stack") + 
+  geom_bar(aes(y = TOT_INF_B, fill = "INF_B"), stat = "identity", color="black", position = "stack") + 
+  labs(title = "Influenza Cases Reported to WHO",
+       subtitle = "WHOREGION = WPR, 2022-2024 Seasons",
+       x = "Week",
+       y = "Number of Positive Specimens",
+       fill = "Influenza Type") + 
+  theme_minimal()
+
+plot5Asave = here("assets", "plot5A.png")
+ggsave(plot5Asave, plot5A, width = 10, height = 6, dpi = 300)
+
+#AMR Region
+WHO_data_fluAMR <- summarized_dataALL %>% filter(WHOREGION == "AMR")
+WHO_data_fluAMR <- WHO_data_fluAMR %>% filter(WHOREGION == "AMR")
+WHO_data_fluAMR <- na.omit(WHO_data_fluAMR)
+
+print(WHO_data_fluAMR)
+
+write.csv(WHO_data_fluAMR, file = "WHO_data_fluAMR.csv", row.names = FALSE)
+
+# Plot the data using a layered bar graph
+plot5B <- ggplot(WHO_data_fluAMR, aes(x = MMWR_WEEKSTARTDATE)) +
+  geom_bar(aes(y = TOT_INF_ALL, fill = "INF_ALL"), stat = "identity", color="black", position = "stack") + 
+  geom_bar(aes(y = TOT_INF_A, fill = "INF_A"), stat = "identity", color="black", position = "stack") + 
+  geom_bar(aes(y = TOT_INF_B, fill = "INF_B"), stat = "identity", color="black", position = "stack") + 
+  labs(title = "Influenza Cases Reported to WHO",
+       subtitle = "WHOREGION = AMR, 2022-2024 Seasons",
+       x = "Week",
+       y = "Number of Positive Specimens",
+       fill = "Influenza Type") + 
+  theme_minimal()
+
+plot5Bsave = here("assets", "plot5B.png")
+ggsave(plot5Bsave, plot5B, width = 10, height = 6, dpi = 300)
+
+#EUR Region
+WHO_data_fluEUR <- summarized_dataALL %>% filter(WHOREGION == "EUR")
+WHO_data_fluEUR <- WHO_data_fluEUR %>% filter(WHOREGION == "EUR")
+WHO_data_fluEUR <- na.omit(WHO_data_fluEUR)
+
+print(WHO_data_fluEUR)
+
+write.csv(WHO_data_fluEUR, file = "WHO_data_fluEUR.csv", row.names = FALSE)
+
+# Plot the data using a layered bar graph
+plot5C <- ggplot(WHO_data_fluAMR, aes(x = MMWR_WEEKSTARTDATE)) +
+  geom_bar(aes(y = TOT_INF_ALL, fill = "INF_ALL"), stat = "identity", color="black", position = "stack") + 
+  geom_bar(aes(y = TOT_INF_A, fill = "INF_A"), stat = "identity", color="black", position = "stack") + 
+  geom_bar(aes(y = TOT_INF_B, fill = "INF_B"), stat = "identity", color="black", position = "stack") + 
+  labs(title = "Influenza Cases Reported to WHO",
+       subtitle = "WHOREGION = AMR, 2022-2024 Seasons",
+       x = "Week",
+       y = "Number of Positive Specimens",
+       fill = "Influenza Type") + 
+  theme_minimal()
+
+plot5Csave = here("assets", "plot5C.png")
+ggsave(plot5Csave, plot5C, width = 10, height = 6, dpi = 300)
+
 
 
 ```
