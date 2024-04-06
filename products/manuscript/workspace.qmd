@@ -75,6 +75,7 @@ knitr::include_graphics(here("assets","antigen-recognition.png"))
 Data was acquired from the World Health Organization Global Influenza Programme. The data includes the excel files containing raw data (VIW_FNT_CM.xlsx) and a file containing the legend for the data (VIW_FLU_METADATA.csv).
 
 ## Data import and cleaning
+
 ## Data import and cleaning
 
 ```{r}
@@ -111,9 +112,10 @@ summary(WHO_data_flu)
 
 
 ```
+
 Wow. That's a lot of data. Okay, let's filter the data a bit. I am still working out what my final analysis will look like and, frankly, doubting my coding abilities to produce a meaningful analysis. That being said, let's take a look.
 
-For example, we might want to look at the total flu cases compared to the number of total cases of the A strains and the total number of the B strains in countries such as China, Australia, Canada, and France.  We also want to clean up the data by omitting any missing values. So we filter!
+For example, we might want to look at the total flu cases compared to the number of total cases of the A strains and the total number of the B strains in countries such as China, Australia, Canada, and France. We also want to clean up the data by omitting any missing values. So we filter!
 
 ```{r}
 
@@ -162,6 +164,7 @@ knitr::include_graphics(here("assets","plot1B.png"))
 
 
 ```
+
 ```{r}
 
 WHO_data_flu1 <- WHO_data_flu %>% filter(COUNTRY_AREA_TERRITORY == "China")
@@ -212,7 +215,7 @@ plot3 <- ggplot(WHO_data_flu2, aes(x = MMWR_WEEKSTARTDATE)) +
   geom_bar(aes(y = INF_A, fill = "INF_A"), stat = "identity", color="black", position = "stack") + 
   geom_bar(aes(y = INF_B, fill = "INF_B"), stat = "identity", color="black", position = "stack") + 
   labs(title = "Influenza Cases Reported to WHO",
-       subtitle = "Country = China, 2022-2024 Seasons",
+       subtitle = "Country = China, 2023-2024 Seasons",
        x = "Week",
        y = "Number of Positive Specimens",
        fill = "Influenza Type") + 
@@ -238,7 +241,7 @@ WHO_data_fluB |>
 plot1C <- ggplot(WHO_data_fluB, aes(x = WHOREGION)) +
   geom_bar(aes(y = INF_ALL, fill = "INF_ALL"), stat = "identity", color="black", position = "stack") + 
   labs(title = "Influenza Cases Reported to WHO",
-       subtitle = "Country = all, 2022-2024 Season",
+       subtitle = "Country = all, 2023-2024 Season",
        x = "WHO Region",
        y = "Number of Positive Specimens",
        fill = "Influenza Type") + 
@@ -313,6 +316,7 @@ write.csv(summarized_dataC, file = "summarized_dataC.csv", row.names = FALSE)
 
 
 ```
+
 ```{r}
 
 selected_regions1 <- c("WPR", "AMR", "EUR")
@@ -448,9 +452,97 @@ ggsave(plot5Csave, plot5C, width = 10, height = 6, dpi = 300)
 
 ```
 
+```{r}
+
+library(lubridate)
+library(dplyr)
+
+print(summarized_data)
+
+summarized_data_work <- summarized_data 
+summarized_data_work <- summarized_data_work %>% mutate(MMWR = format(MMWR_WEEKSTARTDATE , "%Y-%m"))
+
+print(summarized_data_work)
+
+monthly_summary <- summarized_data_work %>% group_by(WHOREGION, MMWR) %>%
+summarize(TOT_FLU = sum(TOT_INF_ALL))
+
+print(monthly_summary)
+
+```
+
+```{r}
+
+monthly_summary1 <- monthly_summary %>% filter(MMWR > '2023-07')
+monthly_summary1 <- monthly_summary1 %>% filter(MMWR > '2023-07')
+
+selected_regions3 <- c("WPR", "AMR", "EUR", "AFR", "SEAR", "EMR")
+monthly_summary2 <- subset(monthly_summary1, WHOREGION %in% selected_regions3)
+
+monthly_summary2 <- monthly_summary2 %>%
+  group_by(WHOREGION, MMWR) 
+
+flu_data_wide <- monthly_summary2 %>% pivot_wider(names_from = MMWR, values_from = TOT_FLU)
+
+print(flu_data_wide)
+
+#Save a rds version
+save_data_location <- here::here("data","processed-data","flu_data_wide.rds")
+saveRDS(flu_data_wide, file = save_data_location)
+
+```
+
+```{r}
+
+data_location <- here::here("data","processed-data","flu_data_wide.rds")
+flu_data_wide <- readRDS(data_location)
 
 
 
+
+flu_data_table <- flu_data_wide |> 
+  gt() |> 
+  cols_label(
+    WHOREGION = 'WHO REGION',
+    `2023-08` = 'AUG',
+    `2023-09` = 'SEPT',
+    `2023-10` = 'OCT',
+    `2023-11` = 'NOV',
+    `2023-12` = 'DEC',
+    `2024-01` = 'JAN',
+    `2024-02` = 'FEB',
+  ) |> 
+  tab_spanner(
+    label = md('**Total Flu Cases Per Month for Each WHO Region.**'),
+    columns = c(`2023-08`,`2023-09`,`2023-10`,`2023-11`, `2023-12`,`2024-01`,`2024-02`)
+  ) 
+
+flu_data_table
+
+```
+
+```{r}
+
+flu_data_table1 <- flu_data_wide |> 
+  gt() |> 
+  cols_label(
+    `2023-08` = "AUG",
+    `2023-09` = "SEPT",
+    `2023-10` = "OCT",
+    `2023-11` = "NOV",
+    `2023-12` = "DEC",
+    `2024-01` = "JAN",
+    `2024-02` = "FEB"
+  ) |> 
+  tab_spanner(
+    label = md('**Total Flu Cases Per Month for Each WHO Region.**'),
+    columns = c(`2023-08`, `2023-09`, `2023-10`, `2023-11`, `2023-12`, `2024-01`, `2024-02`)
+  )
+
+
+flu_data_table1
+
+```
 
 ## Statistical analysis
 
