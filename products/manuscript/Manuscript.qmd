@@ -12,7 +12,6 @@ bibliography: ../../assets/dataanalysis-references.bib
 csl: ../../assets/apa.csl
 ---
 
-
 ```{r, echo=FALSE, message=FALSE}
 
 # load a few R packages
@@ -23,18 +22,15 @@ suppressPackageStartupMessages(library(knitr))
 
 # Abstract:
 
-
-
 # Introduction:
 
-## General Background Information: 
+## General Background Information:
 
-Influenza is an acute respiratory virus caused by one of several strains of virus.  Seasonal influenza is typically caused by circulating "A" and "B" strains of the disease.  Infection is accompanied by typical respiratory symptoms.  These may include cough, sore throat, and nasal discharge. Symptoms can also include abrupt onset of high-grade fever, muscle ache, loss of appetite, headache, and malaise.  After a typical course, influenza can go on to affect other organs such as the lungs, brain, and heart. Severe infections may require hospitalization.  Influenza infection can be much more severe for children, elderly adults, patients with chronic illnesses, and immunocompromised hosts.  According to data provided by the World Health organization, seasonal respiratory illnesses are linked to over 650,000 deaths each year worldwide. In the United States the flu is responsible for approximately 42,000 deaths per year and ranks 13th most frequent cause of death. As such, influenza is the subject of extensive public health surveillance and mediation efforts.**_[@Krammer-2018; @Moghadami-2017]_**
+Influenza is an acute respiratory virus caused by one of several strains of virus. Seasonal influenza is typically caused by circulating "A" and "B" strains of the disease. Infection is accompanied by typical respiratory symptoms. These may include cough, sore throat, and nasal discharge. Symptoms can also include abrupt onset of high-grade fever, muscle ache, loss of appetite, headache, and malaise. After a typical course, influenza can go on to affect other organs such as the lungs, brain, and heart. Severe infections may require hospitalization. Influenza infection can be much more severe for children, elderly adults, patients with chronic illnesses, and immunocompromised hosts. According to data provided by the World Health organization, seasonal respiratory illnesses are linked to over 650,000 deaths each year worldwide. In the United States the flu is responsible for approximately 42,000 deaths per year and ranks 13th most frequent cause of death. As such, influenza is the subject of extensive public health surveillance and mediation efforts.[@Krammer-2018***; @Moghadami-2017***]
 
 ## Description of Data and Data Source:
 
 Detailed data on covid and flu strains, outbreaks, and general epidemiological information is available via several sources. Data on these infectious diseases is available from sites such as GISAID (<https://gisaid.org/>) and the Global Health Data Exchange (<https://ghdx.healthdata.org/>). These databases are highly detailed and can provide data that includes information about lineage and geographic data. (See **Figure 1** Below.) Yearly surveillance data is also available from the World Health Organization Global Influenza Programme.
-
 
 ```{r, echo=FALSE, message=FALSE}
 
@@ -44,7 +40,8 @@ Detailed data on covid and flu strains, outbreaks, and general epidemiological i
 knitr::include_graphics(here("assets","World Flu by Cladep.png"))
 
 ```
-**_Figure 1:_** *World Flu Burden by Clade.* Figure generated at GISAID.org.
+
+***Figure 1:*** *World Flu Burden by Clade.* Figure generated at GISAID.org.
 
 ## Questions/Hypotheses to be Addressed:
 
@@ -56,7 +53,7 @@ The research questions that I would like to answer are:
 
 3.  If a pattern can be established, does it repeat on a yearly basis? Does the pattern shift from year to year? Can other factors, such as weather, account for any changes to this pattern?
 
-I am certain that efforts like this already exist.  The best of these is software produced by Nextstrain (<https://nextstrain.org/>) which is capable of resolving complex time/geographic coupled with genetic data for reported viral infections.  Nextstrain offers real-time tracking of pathogen evolution for viruses such as SARS-CoV-2, seasonal flu, avian flu, mpox, RSV, and dengue.  In fact, the graphic used in Figure 1 (above) was made by GISAID using Nextstrain software.  My purpose for this project is to use this project as a learning tool and to see if I can replicate, in a small way, those prior efforts. Data to support this project is readily available from multiple sources such as GISAID (<https://gisaid.org/>), the World Health Organization Global Influenza Programme (<https://www.who.int/tools/flunet>).
+I am certain that efforts like this already exist. The best of these is software produced by Nextstrain (<https://nextstrain.org/>) which is capable of resolving complex time/geographic coupled with genetic data for reported viral infections. Nextstrain offers real-time tracking of pathogen evolution for viruses such as SARS-CoV-2, seasonal flu, avian flu, mpox, RSV, and dengue. In fact, the graphic used in Figure 1 (above) was made by GISAID using Nextstrain software. My purpose for this project is to use this project as a learning tool and to see if I can replicate, in a small way, those prior efforts. Data to support this project is readily available from multiple sources such as GISAID (<https://gisaid.org/>), the World Health Organization Global Influenza Programme (<https://www.who.int/tools/flunet>).
 
 {{< pagebreak >}}
 
@@ -70,12 +67,11 @@ Data was acquired from the World Health Organization Global Influenza Programme.
 
 ## Data import and cleaning:
 
-Data was imported directly from the repository as an xlsx file. (VIW_FNT_CM.xlsx) The file was cleaned to remove missing data.  A .rds version of the data was saved (VIW_FNT_CM.rds).  Data that was filtered or summarized for graphs, tables, and for eventual statistical analysis were saved as individual .rds or csv files. All data analysis and statistical work was performed and documented in a separate .qmd file (workspace.qmd).  
+Data was imported directly from the repository as an xlsx file. (VIW_FNT_CM.xlsx) The file was cleaned to remove missing data. A .rds version of the data was saved (VIW_FNT_CM.rds). Data that was filtered or summarized for graphs, tables, and for eventual statistical analysis were saved as individual .rds or csv files. All data analysis and statistical work was performed and documented in a separate .qmd file (workspace.qmd).
 
 ## Exploratory/Descriptive analysis:
 
-In order to get a feel for the scale of data in the VIW_FNT_CM.xlsx one often needs to summarize or tabulate the data.  In this case, the data set is very large and summary tables exceedingly cumbersome. Given the size of the data set, it is best to begin with a graph of the incidence of influenza type A, type B, and the total number of reported cases for the duration of reported. (See **Figure 2.**)
-
+In order to get a feel for the scale of data in the VIW_FNT_CM.xlsx one often needs to summarize or tabulate the data. In this case, the data set is very large and summary tables exceedingly cumbersome. Given the size of the data set, it is best to begin with a graph of the incidence of influenza type A, type B, and the total number of reported cases for the duration of reported. (See **Figure 2.**)
 
 ```{r, echo=FALSE, message=FALSE}
 
@@ -85,10 +81,10 @@ In order to get a feel for the scale of data in the VIW_FNT_CM.xlsx one often ne
 knitr::include_graphics(here("assets","plot1.png"))
 
 ```
-**_Figure 2:_** *World Flu Burden by Year.*
 
-The graph reveals the extent of the data available.  The graph also reveals interesting features of the data set that may not have been readily apparent from if viewing the data in a tabular format.  Since 1995 the number of seasonal flu cases has followed a pattern that peaked during the winter months in the Northern hemisphere.  Notable features of this graph include the large jump in reported cases in the year 2010 and the large gap in reported cases in the year 2021.  The jump in cases on or about 2010 is due to increased participation in surveillance efforts and improved diagnostic techniques.  Hand in hand with these factors was an increasing awareness of the issue and consequent increased rate of reporting. **_[@Perdue-2012]_** The gap in the 2021 flu season was likely due to the measures taken to curb the SARS-CoV-2 pandemic through the 2020-2021 flu season.  Basic measures such as maintaining proper social distance, hand washing, public wearing of masks to prevent aerosol droplet spread, and other efforts were extremely effective at preventing the spread of seasonal flu. **_[@Rubin-2021]_**  Never the less, the amount of data reported worldwide since 1995 is massive.  In fact, the data is so dense that none of the categories of flu selected are visible as separate itmes in the bar graph.  Further filtering is obviously required.  For example, we might want to look at the total flu cases compared to the number of total cases of the A strains and the total number of the B strains in countries such as China, Australia, Canada, and France. It is also a good idea to clean up the data by omitting any missing values.  **Figure 3** depicts the data set filtered for information from China.
+***Figure 2:*** *World Flu Burden by Year.*
 
+The graph reveals the extent of the data available. The graph also reveals interesting features of the data set that may not have been readily apparent from if viewing the data in a tabular format. Since 1995 the number of seasonal flu cases has followed a pattern that peaked during the winter months in the Northern hemisphere. Notable features of this graph include the large jump in reported cases in the year 2010 and the large gap in reported cases in the year 2021. The jump in cases on or about 2010 is due to increased participation in surveillance efforts and improved diagnostic techniques. Hand in hand with these factors was an increasing awareness of the issue and consequent increased rate of reporting. [@Perdue-2012] The gap in the 2021 flu season was likely due to the measures taken to curb the SARS-CoV-2 pandemic through the 2020-2021 flu season. Basic measures such as maintaining proper social distance, hand washing, public wearing of masks to prevent aerosol droplet spread, and other efforts were extremely effective at preventing the spread of seasonal flu. [@Rubin-2021] Never the less, the amount of data reported worldwide since 1995 is massive. In fact, the data is so dense that none of the categories of flu selected are visible as separate itmes in the bar graph. Further filtering is obviously required. For example, we might want to look at the total flu cases compared to the number of total cases of the A strains and the total number of the B strains in countries such as China, Australia, Canada, and France. It is also a good idea to clean up the data by omitting any missing values. **Figure 3** depicts the data set filtered for information from China.
 
 ```{r, echo=FALSE, message=FALSE}
 
@@ -98,9 +94,10 @@ The graph reveals the extent of the data available.  The graph also reveals inte
 knitr::include_graphics(here("assets","plot2.png"))
 
 ```
-**_Figure 3:_** *World Flu Burden by Year for China Since Reporting Began.*
 
-Restricting the data set to a single country doesn't seen to resolve the data in a useful manner.  Overall the data still shows the same basic structure and features as the entire data set.  It may be helpful to focus in on a single year.  **Figure 4** depicts the influenza surveillance data for the country of China for a single flu season.  
+***Figure 3:*** *World Flu Burden by Year for China Since Reporting Began.*
+
+Restricting the data set to a single country doesn't seen to resolve the data in a useful manner. Overall the data still shows the same basic structure and features as the entire data set. It may be helpful to focus in on a single year. **Figure 4** depicts the influenza surveillance data for the country of China for a single flu season.
 
 ```{r, echo=FALSE, message=FALSE}
 
@@ -110,10 +107,10 @@ Restricting the data set to a single country doesn't seen to resolve the data in
 knitr::include_graphics(here("assets","plot3.png"))
 
 ```
-**_Figure 4:_** *World Flu Burden by Year: China, 2023-2024 Flu Season.*
 
-These graphs help whittle down the data a bit. For example, we can look at the stacked graph in **Figure 4** to see that over the course of the year the major flu variant shifted from influenza A to influenza B. That being said, this format is not helpful for looking at the incidence over time per country or per region and comparison of those regions.  To look at the data in that manner and, perhaps, look for time and geographical patterns a simple scatter plot may be helpful.  For example, a graph of total reported cases of flu for each WHO region over a single flu season may be revealing. (See **Figure 5**) 
+***Figure 4:*** *World Flu Burden by Year: China, 2023-2024 Flu Season.*
 
+These graphs help whittle down the data a bit. For example, we can look at the stacked graph in **Figure 4** to see that over the course of the year the major flu variant shifted from influenza A to influenza B. That being said, this format is not helpful for looking at the incidence over time per country or per region and comparison of those regions. To look at the data in that manner and, perhaps, look for time and geographical patterns a simple scatter plot may be helpful. For example, a graph of total reported cases of flu for each WHO region over a single flu season may be revealing. (See **Figure 5**)
 
 ```{r, echo=FALSE, message=FALSE}
 
@@ -125,9 +122,9 @@ knitr::include_graphics(here("assets","plot2C.png"))
 
 ```
 
-**_Figure 5:_** *World Flu Burden by Region Over the 2023-2024 Flu Season.*
+***Figure 5:*** *World Flu Burden by Region Over the 2023-2024 Flu Season.*
 
-The resulting graph shows that the maxima for the three largest WHO flu regions, WPR, AMR, and EUR, do follow each other by approximately 3-4 weeks. The region encompassing Europe shows two distinct maxima. The first maxima is preceded by the maxima in the People's Republic of China WHO region by 3-4 weeks and corresponds to the largest maxima in the AMR data. The second is preceded by the maxima in the data from the WHO Americas Region by the same 3-4 week time frame. The data from the AMR region also show a second peak in the number of flu cases reported that follows the first EUR region peak by approximately 3-4 weeks.  Perhaps this indicates spread from EUR back to the AMR region?  As such there certainly seems to be a geographic/time component to the spread of the flu worldwide. (West to east in the northern hemisphere.) Further analysis of the available phylogeographic data may be able to pinpoint the origin of each specific strain.  In **Figure 5** it is also apparent that the relative magnitudes of the values of the WPR, AMR, and EUR regions overwhelm the data from the other WHO regions.  In this case it may be prudent to separate the graphs into separate graphs for WPR, AMR, EUR and AFR, EMR, SEAR. (See **Figure 6** and **Figure 7.**) 
+The resulting graph shows that the maxima for the three largest WHO flu regions, WPR, AMR, and EUR, do follow each other by approximately 3-4 weeks. The region encompassing Europe shows two distinct maxima. The first maxima is preceded by the maxima in the People's Republic of China WHO region by 3-4 weeks and corresponds to the largest maxima in the AMR data. The second is preceded by the maxima in the data from the WHO Americas Region by the same 3-4 week time frame. The data from the AMR region also show a second peak in the number of flu cases reported that follows the first EUR region peak by approximately 3-4 weeks. Perhaps this indicates spread from EUR back to the AMR region? As such there certainly seems to be a geographic/time component to the spread of the flu worldwide. (West to east in the northern hemisphere.) Further analysis of the available phylogeographic data may be able to pinpoint the origin of each specific strain. In **Figure 5** it is also apparent that the relative magnitudes of the values of the WPR, AMR, and EUR regions overwhelm the data from the other WHO regions. In this case it may be prudent to separate the graphs into separate graphs for WPR, AMR, EUR and AFR, EMR, SEAR. (See **Figure 6** and **Figure 7.**)
 
 ```{r, echo=FALSE, message=FALSE}
 
@@ -138,8 +135,8 @@ knitr::include_graphics(here("assets","plot2D.png"))
 
 
 ```
-**_Figure 6:_** *World Flu Burden by Region Over the 2023-2024 Flu Season.*  WHO Regions: WPR, AMR, and EUR
 
+***Figure 6:*** *World Flu Burden by Region Over the 2023-2024 Flu Season.* WHO Regions: WPR, AMR, and EUR
 
 ```{r, echo=FALSE, message=FALSE}
 
@@ -149,9 +146,10 @@ knitr::include_graphics(here("assets","plot2D.png"))
 knitr::include_graphics(here("assets","plot2E.png"))
 
 ```
-**_Figure 7:_** *World Flu Burden by Region Over the 2023-2024 Flu Season.* WHO Regions: AFR, EMR, SEAR
 
-By splitting the graphs a great deal more detail can be discerned.  In addition to the putative west to east pattern that appeared for the WPR, AMR, and EUR WHO regions, there is a similar pattern for the SEAR and EMR regions.  An easy interpretation of this data would point to the seasonal flu beginning in the southeast Asia WHO region progressing to the eastern Mediterranean WHO region, then progressing to the WPR, AMR, and the EUR WHO regions respectively.  Of course, it is impossible to draw any conclusions from this data set and a single season.  To make a solid determination the data set would need to track not just time and geographic information, but connect the actual flu strains as they move around the globe.  This can be done with genetic data, i.e. DNA or RNA sequence data, from the flu cases reported.  In fact this is exactly the approach that the Nextstrain software takes.  In addition to presenting strong evidence of the central question of this research.  Further, graphing the data as opposed to attempting to genrate a summary table is a far more effective way to explore the data set.  As can be seen from **Table 1** (below), a tabular format doesn't highlight the patterns in the data in the same explicit manner as the graphic exploration. 
+***Figure 7:*** *World Flu Burden by Region Over the 2023-2024 Flu Season.* WHO Regions: AFR, EMR, SEAR
+
+By splitting the graphs a great deal more detail can be discerned. In addition to the putative west to east pattern that appeared for the WPR, AMR, and EUR WHO regions, there is a similar pattern for the SEAR and EMR regions. An easy interpretation of this data would point to the seasonal flu beginning in the southeast Asia WHO region progressing to the eastern Mediterranean WHO region, then progressing to the WPR, AMR, and the EUR WHO regions respectively. Of course, it is impossible to draw any conclusions from this data set and a single season. To make a solid determination the data set would need to track not just time and geographic information, but connect the actual flu strains as they move around the globe. This can be done with genetic data, i.e. DNA or RNA sequence data, from the flu cases reported. In fact this is exactly the approach that the Nextstrain software takes. In addition to presenting strong evidence of the central question of this research. Further, graphing the data as opposed to attempting to generate a summary table is a far more effective way to explore the data set. As can be seen from **Table 1** (below), a tabular format doesn't highlight the patterns in the data in the same explicit manner as the graphic exploration.
 
 ```{r, echo=FALSE, message=FALSE}
 data_location <- here::here("data","processed-data","flu_data_wide.rds")
@@ -162,15 +160,21 @@ print(flu_data_wide)
 
 ```
 
+***Table 1:*** *World Flu Burden by Region Over the 2023-2024 Flu Season.*
+
 ## Statistical Analysis:
 
-*Explain anything related to your statistical analyses.*
+A cursory look at the data presented in **Figure 6** (above) shows a putative dependence of the AMR region flu season on the flu season peak approximately 3 week prior in the WPR region.  Likewise the peaks in reported flu cases in the EUR region seem to correspond to the WPR maxima approximately 3 weeks prior followed by a second maxima at a 3 week delay from the AMR region maxima.  A simple multiple linear regression allowing the EUR data to be dependent data, while using offset data from the WPR and AMR regions as independent data should reveal a strong relationship. 
+
+```{r, echo=FALSE, message=FALSE}
+
+
+
+```
 
 {{< pagebreak >}}
 
 # Results
-
-
 
 @tbl-summarytable shows a summary of the data.
 
@@ -183,6 +187,8 @@ Note the loading of the data providing a **relative** path using the `../../` no
 resulttable=readRDS("../../results/tables/summarytable.rds")
 knitr::kable(resulttable)
 ```
+
+***Table 1.*** \*
 
 ## Basic statistical analysis
 
@@ -236,6 +242,5 @@ These papers [@mckay2020; @mckay2020a] are good examples of papers published usi
 Note that this cited reference will show up at the end of the document, the reference formatting is determined by the CSL file specified in the YAML header. Many more style files for almost any journal [are available](https://www.zotero.org/styles). You also specify the location of your bibtex reference file in the YAML. You can call your reference file anything you like.
 
 {{< pagebreak >}}
-
 
 # References

@@ -313,7 +313,88 @@ print(summarized_dataC)
 
 write.csv(summarized_dataC, file = "summarized_dataC.csv", row.names = FALSE)
 
+```
 
+```{r}
+library(skimr)
+
+#Setting up the data.
+data_location <- here::here("data","raw-data","VIW_FNT_CM.xlsx")
+WHO_data_flu <- readxl::read_excel(data_location)
+
+WHO_data_flu <- WHO_data_flu %>% 
+  select(WHOREGION, MMWR_WEEKSTARTDATE, INF_ALL)
+
+#summarize the data in flu tot.
+WHO_data_sum <- WHO_data_flu %>%
+  group_by(WHOREGION, MMWR_WEEKSTARTDATE) %>%
+  summarize(TOT_INF_ALL = sum(INF_ALL))
+
+# Filter the data set for the selected regions
+selected_regions1 <- c("WPR", "AMR", "EUR")
+WHO_data_reg <- subset(WHO_data_sum, WHOREGION %in% selected_regions1)
+
+
+#Generate the data sets for 2017-2018, 2018-2019, and 2019-2020
+Sum_data_2017 <- WHO_data_reg %>% filter(MMWR_WEEKSTARTDATE > '2017-05-01' & MMWR_WEEKSTARTDATE < '2018-02-28')
+Sum_data_2017 <- Sum_data_2017 %>% filter(MMWR_WEEKSTARTDATE > '2017-05-01' & MMWR_WEEKSTARTDATE < '2018-02-28')
+Sum_data_2017 <- na.omit(Sum_data_2017)
+
+
+Sum_data_2018 <- WHO_data_reg %>% filter(MMWR_WEEKSTARTDATE > '2018-05-01' & MMWR_WEEKSTARTDATE < '2019-02-28')
+Sum_data_2018 <- Sum_data_2018 %>% filter(MMWR_WEEKSTARTDATE > '2018-05-01' & MMWR_WEEKSTARTDATE < '2019-02-28')
+Sum_data_2018 <- na.omit(Sum_data_2018)
+
+
+Sum_data_2019 <- WHO_data_reg %>% filter(MMWR_WEEKSTARTDATE > '2019-05-01' & MMWR_WEEKSTARTDATE < '2020-02-28')
+Sum_data_2019 <- Sum_data_2019 %>% filter(MMWR_WEEKSTARTDATE > '2019-05-01' & MMWR_WEEKSTARTDATE < '2020-02-28')
+Sum_data_2019 <- na.omit(Sum_data_2019)
+
+# Graphs of prior flu years
+# Season 2017 - 2018
+plot2017 <- ggplot(Sum_data_2017, aes(x=MMWR_WEEKSTARTDATE)) +
+  geom_point(aes(y=TOT_INF_ALL, color = WHOREGION)) +
+  geom_line(aes(y=TOT_INF_ALL, color = WHOREGION)) +
+    labs(x = "DATE", y = "Total Reported Cases of FLU", title = "Scatterplot Flu Cases Per WHO Region for the 2017-2018 Flu Season") +
+  theme_minimal()
+
+plot2017save = here("assets", "plot2017.png")
+ggsave(plot2017save, plot2017, width = 10, height = 6, dpi = 300)
+
+#| label: fig-schematic
+#| fig-cap: "Figure XX: World Flu Burden by Region Over the 2023-2024 Flu Season."
+#| echo: FALSE
+knitr::include_graphics(here("assets","plot2017.png"))
+
+# Season 2018-2019
+plot2018 <- ggplot(Sum_data_2018, aes(x=MMWR_WEEKSTARTDATE)) +
+  geom_point(aes(y=TOT_INF_ALL, color = WHOREGION)) +
+  geom_line(aes(y=TOT_INF_ALL, color = WHOREGION)) +
+    labs(x = "DATE", y = "Total Reported Cases of FLU", title = "Scatterplot Flu Cases Per WHO Region for the 2018-2019 Flu Season") +
+  theme_minimal()
+
+plot2018save = here("assets", "plot2018.png")
+ggsave(plot2018save, plot2018, width = 10, height = 6, dpi = 300)
+
+#| label: fig-schematic
+#| fig-cap: "Figure XX: World Flu Burden by Region Over the 2018-2019 Flu Season."
+#| echo: FALSE
+knitr::include_graphics(here("assets","plot2018.png"))
+
+#Season 2019 - 2020
+plot2019 <- ggplot(Sum_data_2019, aes(x=MMWR_WEEKSTARTDATE)) +
+  geom_point(aes(y=TOT_INF_ALL, color = WHOREGION)) +
+  geom_line(aes(y=TOT_INF_ALL, color = WHOREGION)) +
+    labs(x = "DATE", y = "Total Reported Cases of FLU", title = "Scatterplot Flu Cases Per WHO Region for the 2019-2020 Flu Season") +
+  theme_minimal()
+
+plot2019save = here("assets", "plot2019.png")
+ggsave(plot2019save, plot2019, width = 10, height = 6, dpi = 300)
+
+#| label: fig-schematic
+#| fig-cap: "Figure XX: World Flu Burden by Region Over the 2018-2019 Flu Season."
+#| echo: FALSE
+knitr::include_graphics(here("assets","plot2019.png"))
 
 ```
 
@@ -519,6 +600,11 @@ flu_data_table <- flu_data_wide |>
 
 flu_data_table
 
+
+library(gt)
+flu_data_wide |> 
+  gt() 
+
 ```
 
 ```{r}
@@ -547,6 +633,70 @@ flu_data_table1
 ## Statistical analysis
 
 *Explain anything related to your statistical analyses.*
+```{r, echo=FALSE, message=FALSE}
+
+suppressPackageStartupMessages(library(parsnip))
+suppressPackageStartupMessages(library(tune))
+suppressPackageStartupMessages(library(recipes))
+suppressPackageStartupMessages(library(workflows))
+suppressPackageStartupMessages(library(yardstick))
+suppressPackageStartupMessages(library(rsample))
+
+data_location <- here::here("data","raw-data","DATE_REGION.xlsx")
+date_region <- readxl::read_excel(data_location)
+
+date_region2 <- date_region %>% select(AFR, AMR, EMR, EUR, SEAR, WPR)
+
+# fit the linear models with AMR as outcome 
+# model has ALL OTHER REGIONS as predictors
+lin_mod <- linear_reg() %>% set_engine("lm")
+linfit1 <- lin_mod %>% fit(AMR ~ ., data = date_region2)
+
+#model 2 -- includes date variable
+lin_mod <- linear_reg() %>% set_engine("lm")
+linfit2 <- lin_mod %>% fit(AMR ~ ., data = date_region)
+
+# Compute the RMSE and R squared for model 1
+metrics_1 <- linfit1 %>% 
+  predict(date_region2) %>% 
+  bind_cols(date_region2) %>% 
+  metrics(truth = AMR, estimate = .pred)
+
+# Compute the RMSE and R squared for model 2
+metrics_2 <- linfit2 %>% 
+  predict(date_region) %>% 
+  bind_cols(date_region) %>% 
+  metrics(truth = AMR, estimate = .pred)
+
+lmtable1 <- broom::tidy(linfit1)
+print(lmtable1)
+print(metrics_1)
+
+save_data_location <- here::here("assets","lmtable1.txt")
+write.table(lmtable1, file = save_data_location, sep = "\t", row.names = FALSE)
+
+lmtable2 <- broom::tidy(linfit2)
+print(lmtable2)
+print(metrics_2)
+
+save_data_location <- here::here("assets","lmtable2.txt")
+write.table(lmtable2, file = save_data_location, sep = "\t", row.names = FALSE)
+
+
+data_location <- here::here("data","raw-data","REGION_OFFSET.xlsx")
+Region_offset <- readxl::read_excel(data_location)
+
+print(Region_offset)
+
+lmfitB1 <- lm(EUR ~ WPR + AMR + EMR, Region_offset) 
+lmtableB1 <- broom::tidy(lmfitB1)
+print(lmtableB1)
+
+logfitB1 <- glm(EUR ~ WPR + AMR + EMR, data = Region_offset)
+logtableB1 <- broom::tidy(logfitB1)
+print(logtableB1)
+
+```
 
 {{< pagebreak >}}
 
